@@ -81,6 +81,7 @@ chroma_db/
 # Uploaded Documents
 # -----------------------------
 uploads/
+*.pdf
 
 # -----------------------------
 # Ollama Cache (Optional)
