@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -14,6 +15,19 @@ class Settings:
     debug: bool = os.getenv("DEBUG", "false").lower() == "true"
     api_prefix: str = os.getenv("API_PREFIX", "/api/v1")
     log_level: str = os.getenv("LOG_LEVEL", "INFO").upper()
+
+    upload_directory: Path = Path(
+        os.getenv("UPLOAD_DIRECTORY", "uploads")
+    )
+    max_file_size_mb: int = int(
+        os.getenv("MAX_FILE_SIZE_MB", "10")
+    )
+
+    @property
+    def max_file_size_bytes(self) -> int:
+        """Return the maximum allowed upload size in bytes."""
+
+        return self.max_file_size_mb * 1024 * 1024
 
 
 settings = Settings()
