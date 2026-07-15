@@ -18,6 +18,7 @@ class DocumentService:
     def __init__(self) -> None:
         self.upload_directory = settings.upload_directory
         self.upload_directory.mkdir(parents=True, exist_ok=True)
+    
 
     async def save_pdf(self, file: UploadFile) -> dict[str, object]:
         """Validate and save an uploaded PDF document."""
@@ -87,6 +88,7 @@ class DocumentService:
             stored_filename,
             size_bytes,
         )
+        
 
         return {
             "document_id": document_id,
@@ -96,6 +98,19 @@ class DocumentService:
             "size_bytes": size_bytes,
             "status": "uploaded",
         }
+    
+    def get_document_path(self, document_id: str) -> Path:
+        """Return the stored path for an uploaded PDF."""
+
+        document_path = self.upload_directory / f"{document_id}.pdf"
+
+        if not document_path.exists():
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Document not found.",
+            )
+
+        return document_path
 
 
 document_service = DocumentService()
