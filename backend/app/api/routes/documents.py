@@ -10,6 +10,12 @@ from app.schemas.document import (
 )
 from app.services.pdf_extraction_service import pdf_extraction_service
 
+from app.rag.text_splitter import text_chunker
+
+import logging
+
+logger = logging.getLogger(__name__)
+
 router = APIRouter(
     prefix="/documents",
     tags=["Documents"],
@@ -43,6 +49,23 @@ def extract_document_text(
 
     extraction = pdf_extraction_service.extract_text(document_path)
 
+    chunks = text_chunker.split_pages(
+    document_id=document_id,
+    document_name=document_path.name,
+    pages=[
+        {
+            "page_number": page.page_number,
+            "text": page.text
+        }
+        for page in extraction["pages"]
+        ]
+    )
+
+    logger.info(
+    "Created %s chunks for document %s",
+    len(chunks),
+    document_id,
+)
     return DocumentExtractionResponse(
         document_id=document_id,
         original_filename=document_path.name,
