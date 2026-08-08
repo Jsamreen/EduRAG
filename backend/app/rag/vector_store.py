@@ -34,5 +34,30 @@ class VectorStore:
             len(documents),
         )
 
+    def search(
+        self,
+        query: str,
+        limit: int = 4,
+        ) -> list[tuple[Document, float]]:
+        """Return the most relevant chunks and their relevance scores."""
+
+        cleaned_query = query.strip()
+
+        if not cleaned_query:
+            raise ValueError("Search query cannot be empty.")
+
+        results = self.db.similarity_search_with_relevance_scores(
+            query=cleaned_query,
+            k=limit,
+        )
+
+        logger.info(
+            "Retrieved %s chunks for query: %s",
+            len(results),
+            cleaned_query,
+        )
+
+        return results
+
 
 vector_store = VectorStore()
