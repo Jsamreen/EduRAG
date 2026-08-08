@@ -12,6 +12,8 @@ from app.services.pdf_extraction_service import pdf_extraction_service
 
 from app.rag.text_splitter import text_chunker
 
+from app.rag.embedding_service import embedding_service
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -61,11 +63,23 @@ def extract_document_text(
         ]
     )
 
+    embeddings = embedding_service.embed_chunks(chunks)
+
     logger.info(
-    "Created %s chunks for document %s",
+    "Created %s chunks and %s embeddings.",
     len(chunks),
-    document_id,
+    len(embeddings),
 )
+    logger.info(
+    "Embedding dimension: %s",
+    len(embeddings[0]),
+)
+
+    logger.info(
+        "First 10 values of first embedding:\n%s",
+        embeddings[0][:10],
+)
+    
     return DocumentExtractionResponse(
         document_id=document_id,
         original_filename=document_path.name,
