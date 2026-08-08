@@ -2,6 +2,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, File, UploadFile, status
 
+from app.rag.vector_store import vector_store
+
 from app.services.document_service import document_service
 
 from app.schemas.document import (
@@ -65,6 +67,8 @@ def extract_document_text(
 
     embeddings = embedding_service.embed_chunks(chunks)
 
+    vector_store.add_documents(chunks)
+
     logger.info(
     "Created %s chunks and %s embeddings.",
     len(chunks),
@@ -78,6 +82,11 @@ def extract_document_text(
     logger.info(
         "First 10 values of first embedding:\n%s",
         embeddings[0][:10],
+)
+
+    logger.info(
+        "stored %s chunks in ChromaDB.",
+        len(chunks),
 )
     
     return DocumentExtractionResponse(
