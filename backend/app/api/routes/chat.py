@@ -1,59 +1,50 @@
-import logging
+from fastapi import APIRouter, HTTPException
 
-from fastapi import APIRouter, HTTPException, status
-
+from app.schemas.chat import ChatRequest, ChatResponse
 from app.rag.retrieval_service import retrieval_service
+from app.rag.llm_service import llm_service
 
-from app.schemas.chat import (
-    SearchRequest,
-    SearchResponse,
-    SearchResult,
+router = APIRouter(
+    prefix="/chat",
+    tags=["Chat"]
 )
-
-logger = logging.getLogger(__name__)
-
-router = APIRouter(prefix="/chat", tags=["Chat"])
 
 
 @router.post(
-    "/search",
-    response_model=SearchResponse,
+    "",
+    response_model=ChatResponse
 )
-def search_documents(
-    request: SearchRequest,
-) -> SearchResponse:
-    """Retrieve relevant document chunks from ChromaDB."""
+def chat(request: ChatRequest):
 
     try:
-        matches = retrieval_service.search(
-            query=request.query,
-            limit=request.limit,
+
+        # Step 1: Retrieve relevant chunks
+        results = retrieval_service.search(
+            query=request.question,
+            limit=4
         )
 
-        results = [
-            SearchResult(
-                page=document.metadata.get("page", 0),
-                score=round(score, 4),
-                text=document.page_content,
-                document_id=document.metadata.get("document_id", ""),
-                document_name=document.metadata.get("document_name", ""),
-            )
-            for document, score in matches
-        ]
-
-        logger.info(
-            "Returned %s search results for query: %s",
-            len(results),
-            request.query,
+        # Step 2: Combine chunks into context
+        context = "\n\n".join(
+            document.page_content
+            for document, score in results
         )
 
-        return SearchResponse(
-            query=request.query,
-            results=results,
+        # Step 3: Build prompt
+        prompt = llm_service.build_prompt(
+            question=request.question,
+            context=context
         )
 
-    except ValueError as exc:
+        # Step 4: Generate answer
+        answer = llm_service.generate(prompt)
+
+        return ChatResponse(
+            answer=answer
+        )
+
+    except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(exc),
-        ) from exc
+            status_code=500,
+            detail=str(e)
+        )

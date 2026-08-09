@@ -1,54 +1,37 @@
-import logging
-
 import ollama
-
-logger = logging.getLogger(__name__)
 
 
 class LLMService:
-    """Generate answers using Ollama."""
+    def build_prompt(self, question: str, context: str) -> str:
+        return f"""
+        You are a helpful AI assistant.
 
-    def __init__(self):
-        self.model = "llama3.2:3b"
+        Answer the user's question ONLY using the provided context.
 
-    def generate_answer(
-        self,
-        question: str,
-        context: str,
-    ) -> str:
-        prompt = f"""
-You are EduRAG, an AI assistant.
+        If the answer is not found in the context, reply:
 
-Answer ONLY using the provided context.
+        "I couldn't find that information in the uploaded document."
 
-If the answer is not present in the context, reply:
+        Context:
+        {context}
 
-"I couldn't find the answer in the uploaded documents."
+        Question:
+        {question}
 
-Context:
-{context}
+        Answer:
+        """
 
-Question:
-{question}
-
-Answer:
-"""
-
-        response = ollama.chat(
-            model=self.model,
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt,
-                }
-            ],
-        )
-
-        answer = response["message"]["content"]
-
-        logger.info("Generated answer using Ollama.")
-
-        return answer.strip()
-
-
+    def generate(self, prompt: str) -> str:
+            response = ollama.chat(
+                model="llama3.2:3b",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ]
+            )
+    
+            return response["message"]["content"]
+    
 llm_service = LLMService()
