@@ -9,6 +9,7 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 
+
 # -----------------------------
 # Virtual Environment
 # -----------------------------
@@ -93,3 +94,16 @@ ollama_data/
 # -----------------------------
 *.tmp
 *.temp
+metadata/
+chroma_db/
+
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.env
+
+# OS / IDE
+.vscode/
+.DS_Store

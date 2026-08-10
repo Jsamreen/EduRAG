@@ -80,15 +80,4 @@ class VectorStore:
 
         return results
 
-    def debug(self):
-        data = self.db.get()
-
-        print("\n===== CHROMA DEBUG =====")
-        print("Documents:", len(data["documents"]))
-
-        for metadata in data["metadatas"]:
-            print(metadata)
-
-
 vector_store = VectorStore()
-vector_store.debug()

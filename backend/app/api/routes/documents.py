@@ -91,11 +91,6 @@ def extract_document_text(
 )
 
     logger.info(
-        "First 10 values of first embedding:\n%s",
-        embeddings[0][:10],
-)
-
-    logger.info(
         "stored %s chunks in ChromaDB.",
         len(chunks),
 )
