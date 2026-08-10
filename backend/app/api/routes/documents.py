@@ -26,6 +26,20 @@ router = APIRouter(
 )
 
 
+# @router.post(
+#     "/upload",
+#     response_model=DocumentUploadResponse,
+#     status_code=status.HTTP_201_CREATED,
+# )
+# async def upload_document(
+#     file: Annotated[UploadFile, File(description="University PDF document")],
+# ) -> DocumentUploadResponse:
+#     """Upload and store a university PDF document."""
+
+#     result = await document_service.save_pdf(file)
+
+#     return DocumentUploadResponse(**result)
+
 @router.post(
     "/upload",
     response_model=DocumentUploadResponse,
@@ -34,15 +48,51 @@ router = APIRouter(
 async def upload_document(
     file: Annotated[UploadFile, File(description="University PDF document")],
 ) -> DocumentUploadResponse:
-    """Upload and store a university PDF document."""
+    """Upload, extract and index a university PDF document."""
 
+    # Step 1 - Save PDF
     result = await document_service.save_pdf(file)
+
+    document_id = result["document_id"]
+
+    # Step 2 - Load saved document
+    document_path = document_service.get_document_path(document_id)
+    metadata = document_service.get_document_metadata(document_id)
+
+    # Step 3 - Extract text
+    extraction = pdf_extraction_service.extract_text(document_path)
+
+    # Step 4 - Split into chunks
+    chunks = text_chunker.split_pages(
+        document_id=document_id,
+        document_name=metadata["original_filename"],
+        pages=[
+            {
+                "page_number": page.page_number,
+                "text": page.text,
+            }
+            for page in extraction["pages"]
+        ],
+    )
+
+    # Step 5 - Generate embeddings ( useful for logging)
+    embedding_service.embed_chunks(chunks)
+
+    # Step 6 - Store in ChromaDB
+    vector_store.add_documents(chunks)
+
+    logger.info(
+        "Uploaded and indexed '%s' (%s chunks)",
+        metadata["original_filename"],
+        len(chunks),
+    )
 
     return DocumentUploadResponse(**result)
 
 @router.post(
     "/{document_id}/extract",
     response_model=DocumentExtractionResponse,
+    include_in_schema=False,
 )
 def extract_document_text(
     document_id: str,
