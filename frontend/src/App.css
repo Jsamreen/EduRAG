@@ -1,82 +1,231 @@
-body{
-    margin:0;
-    background:#f4f6f8;
-    font-family:Arial, Helvetica, sans-serif;
+* {
+  box-sizing: border-box;
 }
 
-.container{
-
-    max-width:900px;
-
-    margin:50px auto;
-
-    background:white;
-
-    border-radius:12px;
-
-    padding:30px;
-
-    box-shadow:0 10px 25px rgba(0,0,0,.08);
+body {
+  margin: 0;
+  font-family: Inter, Arial, Helvetica, sans-serif;
+  background: linear-gradient(135deg, #f5f7fb, #eef3ff);
+  color: #1f2937;
 }
 
-header{
-
-    text-align:center;
-
-    margin-bottom:40px;
+button,
+input {
+  font: inherit;
 }
 
-header h1{
-
-    color:#2563eb;
-
-    margin-bottom:10px;
+.container {
+  width: min(920px, calc(100% - 32px));
+  margin: 40px auto;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 36px;
+  box-shadow: 0 18px 50px rgba(30, 64, 175, 0.08);
 }
 
-header p{
-
-    color:#666;
+header {
+  text-align: center;
+  margin-bottom: 34px;
 }
 
-.card{
-
-    margin-top:30px;
-
-    border:1px solid #eee;
-
-    padding:25px;
-
-    border-radius:10px;
+header h1 {
+  margin: 0;
+  font-size: 2.7rem;
+  color: #2563eb;
 }
 
-.card h2{
-
-    margin-top:0;
+header p {
+  margin-top: 8px;
+  color: #6b7280;
+  font-size: 1.08rem;
 }
 
-input[type=file]{
-
-    margin:20px 0;
+.card {
+  margin-top: 24px;
+  padding: 28px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
 }
 
-button{
-
-    background:#2563eb;
-
-    color:white;
-
-    border:none;
-
-    padding:10px 22px;
-
-    border-radius:6px;
-
-    cursor:pointer;
-
-    font-size:16px;
+.card h2 {
+  margin-top: 0;
+  margin-bottom: 18px;
+  font-size: 1.35rem;
+  color: #111827;
 }
 
-button:hover{
+.card h3 {
+  margin-top: 24px;
+  margin-bottom: 10px;
+  color: #374151;
+}
 
-    background:#1d4ed8;
+input[type="file"] {
+  width: 100%;
+  margin: 8px 0 18px;
+  padding: 12px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.card input[type="text"] {
+  width: calc(100% - 130px);
+  padding: 13px 14px;
+  margin-right: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 9px;
+  outline: none;
+}
+
+.card input[type="text"]:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 9px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+button:hover:not(:disabled) {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.answer-card {
+  background: #fbfdff;
+}
+
+.answer-text {
+  text-align: left;
+  color: #374151;
+  line-height: 1.7;
+  font-size: 1.05rem;
+}
+
+.sources {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.source {
+  padding: 12px 14px;
+  border-radius: 9px;
+  background: #f1f5f9;
+  color: #475569;
+  border-left: 4px solid #2563eb;
+}
+
+@media (max-width: 700px) {
+  .container {
+    margin: 20px auto;
+    padding: 22px;
+  }
+
+  header h1 {
+    font-size: 2.1rem;
+  }
+
+  .card input[type="text"] {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 12px;
+  }
+
+  .card button {
+    width: 100%;
+  }
+}y
+
+.question-row {
+  display: flex;
+  align-items: center;
+}
+
+.thinking-loader {
+  margin-top: 24px;
+  padding: 22px;
+  text-align: center;
+  background: #f8faff;
+  border-radius: 14px;
+  border: 1px solid #e1e8ff;
+}
+
+.student {
+  font-size: 44px;
+  animation: studentThink 1.8s ease-in-out infinite;
+}
+
+.book-animation {
+  font-size: 36px;
+  margin-top: -5px;
+  animation: bookMove 1.2s ease-in-out infinite alternate;
+}
+
+.thinking-text {
+  margin-top: 10px;
+  color: #64748b;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.dots span {
+  animation: dotPulse 1.4s infinite;
+  opacity: 0;
+}
+
+.dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes studentThink {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-5px) rotate(-3deg);
+  }
+}
+
+@keyframes bookMove {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.12);
+  }
+}
+
+@keyframes dotPulse {
+  0% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
 }
