@@ -15,7 +15,6 @@ class VectorStore:
     """
 
     def __init__(self):
-
         self.db = Chroma(
             collection_name="edu_rag",
             embedding_function=embedding_service.embedding_model,
@@ -26,6 +25,23 @@ class VectorStore:
         self,
         documents: list[Document],
     ) -> None:
+
+        if not documents:
+            return
+
+        document_id = documents[0].metadata.get("document_id")
+
+        if document_id:
+            self.db.delete(
+                where={
+                    "document_id": document_id
+                }
+            )
+
+            logger.info(
+                "Removed existing chunks for document %s",
+                document_id,
+            )
 
         self.db.add_documents(documents)
 
@@ -38,17 +54,22 @@ class VectorStore:
         self,
         query: str,
         limit: int = 4,
-        ) -> list[tuple[Document, float]]:
+    ) -> list[tuple[Document, float]]:
         """Return the most relevant chunks and their relevance scores."""
 
         cleaned_query = query.strip()
 
         if not cleaned_query:
-            raise ValueError("Search query cannot be empty.")
+            raise ValueError(
+                "Search query cannot be empty."
+            )
 
-        results = self.db.similarity_search_with_relevance_scores(
-            query=cleaned_query,
-            k=limit,
+        results = (
+            self.db
+            .similarity_search_with_relevance_scores(
+                query=cleaned_query,
+                k=limit,
+            )
         )
 
         logger.info(
@@ -59,5 +80,15 @@ class VectorStore:
 
         return results
 
+    def debug(self):
+        data = self.db.get()
+
+        print("\n===== CHROMA DEBUG =====")
+        print("Documents:", len(data["documents"]))
+
+        for metadata in data["metadatas"]:
+            print(metadata)
+
 
 vector_store = VectorStore()
+vector_store.debug()

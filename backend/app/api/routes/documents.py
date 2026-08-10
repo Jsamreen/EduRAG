@@ -52,10 +52,10 @@ def extract_document_text(
     document_path = document_service.get_document_path(document_id)
 
     extraction = pdf_extraction_service.extract_text(document_path)
-
+    metadata = document_service.get_document_metadata(document_id)
     chunks = text_chunker.split_pages(
     document_id=document_id,
-    document_name=document_path.name,
+    document_name=metadata["original_filename"],
     pages=[
         {
             "page_number": page.page_number,
@@ -69,6 +69,17 @@ def extract_document_text(
 
     vector_store.add_documents(chunks)
 
+    if embeddings:
+        logger.info(
+            "Embedding dimension: %s",
+            len(embeddings[0]),
+        )
+
+        logger.info(
+            "First 10 values of first embedding:\n%s",
+            embeddings[0][:10],
+        )
+        
     logger.info(
     "Created %s chunks and %s embeddings.",
     len(chunks),
@@ -91,7 +102,7 @@ def extract_document_text(
     
     return DocumentExtractionResponse(
         document_id=document_id,
-        original_filename=document_path.name,
+        original_filename=metadata["original_filename"],
         total_pages=extraction["total_pages"],
         pages_with_text=extraction["pages_with_text"],
         total_characters=extraction["total_characters"],
