@@ -1,15 +1,19 @@
 import logging
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+
 from app.api.router import api_router
 from app.core.config import settings
 from app.core.logging import configure_logging
 
+
 configure_logging()
 
-
 logger = logging.getLogger(__name__)
+
 
 app = FastAPI(
     title=settings.app_name,
@@ -17,6 +21,11 @@ app = FastAPI(
     version=settings.app_version,
     debug=settings.debug,
 )
+
+
+# ----------------------------------------------
+# CORS
+# ---------------------------------------------------------
 
 app.add_middleware(
     CORSMiddleware,
@@ -30,22 +39,19 @@ app.add_middleware(
 )
 
 
+# ---------------------------------------------------
+# API Routes
+# ---------------------------------------------------------
+
 app.include_router(
     api_router,
     prefix=settings.api_prefix,
 )
 
 
-@app.get("/", tags=["Root"])
-def root() -> dict[str, str]:
-    """Return basic application information."""
-
-    return {
-        "message": "Welcome to EduRAG API",
-        "environment": settings.app_env,
-        "documentation": "/docs",
-    }
-
+# --------------------------------------------------
+# Startup
+# ---------------------------------------------------------
 
 @app.on_event("startup")
 def startup_event() -> None:
@@ -54,4 +60,20 @@ def startup_event() -> None:
         settings.app_name,
         settings.app_version,
         settings.app_env,
+    )
+
+
+# ---------------------------------------------------------
+# React Frontend
+
+frontend_directory = Path("/app/frontend_dist")
+
+if frontend_directory.exists():
+    app.mount(
+        "/",
+        StaticFiles(
+            directory=frontend_directory,
+            html=True,
+        ),
+        name="frontend",
     )
