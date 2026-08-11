@@ -27,6 +27,25 @@ Answers also include the source document and page number used to generate the re
 - 🔒 Local LLM inference using Ollama
 
 ---
+## 📸 Application Screenshots
+
+### EduRAG User Interface
+
+Upload university PDF documents and interact with them through the web interface.
+
+![EduRAG User Interface](docs/screenshots/home.png)
+
+### RAG Question Answering with Source Citations
+
+EduRAG retrieves relevant document context and generates grounded answers while displaying the source document and page number.
+
+![EduRAG Question Answering](docs/screenshots/Thinking_01.png)
+
+### Containerized Application
+
+The complete application is containerized with Docker, including the React frontend, FastAPI backend, ChromaDB vector store, and local Ollama integration.
+
+![EduRAG Docker Container](docs/screenshots/docker.png)
 
 ## 🧠 How EduRAG Works
 
